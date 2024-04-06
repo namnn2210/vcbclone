@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, ImageBackground, TextInput, ScrollView, Modal, Alert, StyleSheet } from 'react-native';
+import { Pressable, FlatList, View, Text, TouchableOpacity, ImageBackground, TextInput, ScrollView, Modal, Alert, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
@@ -125,6 +125,19 @@ const ConfirmScreen = ({ route }: { route: any }) => {
   const refs = useRef<TextInput[]>([]);
   const setInfo = useAuthetication((state: any) => state.setInfo);
 
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const options = ['VCB - Smart OTP', 'FaceID', 'SMS OTP'];
+
+  const handleChooseAuth = () => {
+    if (selectedOption === 'VCB - Smart OTP') {
+      setShowOTP(true);
+    }
+    else if (selectedOption === 'FaceID') {
+      onLoginFaceId();
+    }
+  }
+
   const handleChangeText = (value: string, index: number) => {
     if (isNaN(Number(value))) return;
 
@@ -196,9 +209,30 @@ const ConfirmScreen = ({ route }: { route: any }) => {
   const onLoginFaceId = async () => {
     const hasAuth = await LocalAuthentication.hasHardwareAsync();
     if (hasAuth) {
+      console.log("hasAuth: ", hasAuth);
       const res: any = await LocalAuthentication.authenticateAsync();
       if (!!res) {
+        setLoading(true);
+        const currentAmout: any = await LocalStorage.getUser();
+        const amoutAfterTransferConvert: any = convertToInteger(dataRoute?.amount);
+        const amoutAfterTransfer = parseInt(currentAmout.amount) - parseInt(amoutAfterTransferConvert);
+        const updatedUser = { ...currentAmout, amount: amoutAfterTransfer.toString() };
 
+        LocalStorage.setUser(updatedUser);
+        setInfo(updatedUser);
+        setTimeout(() => {
+          const newTransaction = {
+            date: moment().format('DD/MM/YYYY'),
+            code: `${Math.floor(Math.random() * 1000000000)}.${Math.floor(Math.random() * 1000000000)}.${Math.floor(
+              Math.random() * 1000000000,
+            )}`,
+            amout: `-${amoutAfterTransferConvert}`,
+            type: 'minus',
+          };
+          addTransactions(newTransaction);
+          setLoading(false);
+          navigate(MAIN_NAVIGATION.BILL, { dataRoute });
+        }, 1500);
       }
     }
   };
@@ -263,13 +297,94 @@ const ConfirmScreen = ({ route }: { route: any }) => {
             }}>
             Chọn phương thức xác thực
           </Text>
-          <InputReadBox
-            txt={'VCB - Smart OTP'}
-            icon={'caret-down'}
-          />
+          <Pressable onPress={() => setModalVisible(true)}>
+            <InputReadBox
+              txt={selectedOption || 'VCB - Smart OTP'}
+              icon={'caret-down'}
+            />
+          </Pressable>
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => setModalVisible(false)}
+          >
+            <View
+              style={{
+                flex: 1,
+                position: 'absolute',
+                width: '100%',
+                height: '100%',
+                marginTop: 700,
+                borderRadius: 24,
+                backgroundColor: '#fff'
+              }}>
+              <LinearGradient
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                colors={['#2f9929', '#2f9929', '#5db422']}
+                style={{
+                  padding: 10,
+                  elevation: 2,
+                  borderTopRightRadius: 24,
+                  borderTopLeftRadius: 24,
+                  flexDirection: 'row-reverse',
+                }}>
+                <View style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  height: 38,
+                }}>
+                  <Text
+                    style={{
+                      color: 'white',
+                      fontWeight: 'bold',
+                      textAlign: 'center',
+                      fontSize: 16,
+                      fontFamily: '',
+                      flex: 1
+                    }}>
+                    Phương thức xác thực
+                  </Text>
+                  <Pressable
+                    style={{ justifyContent: 'center' }}
+                    onPress={() => setModalVisible(!modalVisible)}>
+                    <Text
+                      style={{
+                        color: 'white',
+                        fontWeight: 'bold',
+                        textAlign: 'center',
+                        fontSize: 16,
+                        fontFamily: '',
+                      }}>
+                      Đóng
+                    </Text>
+                  </Pressable>
+                </View>
+              </LinearGradient>
+              <View>
+                <FlatList
+                  data={options}
+                  keyExtractor={(item) => item}
+                  renderItem={({ item }) => (
+                    <Pressable onPress={() => {
+                      setSelectedOption(item);
+                      setModalVisible(false);
+                    }} style={{
+                      padding: 16,
+                      borderBottomWidth: 1,
+                      borderBottomColor: '#f0f0f0',
 
+                    }}>
+                      <Text style={{ fontSize: 16, fontWeight: 'bold', textTransform: 'uppercase', color: 'gray' }}>{item}</Text>
+                    </Pressable>
+                  )}
+                />
+              </View>
+            </View>
+          </Modal>
           <Padding />
-
           <Modal
             animationType="slide"
             transparent={true}
@@ -556,9 +671,7 @@ const ConfirmScreen = ({ route }: { route: any }) => {
               borderRadius: 10,
             }}>
             <TouchableOpacity
-              onPress={() => {
-                setShowOTP(true)
-              }}
+              onPress={handleChooseAuth}
               style={{
                 flexDirection: 'row',
                 justifyContent: 'center',
