@@ -68,12 +68,12 @@
       "favicon": "./assets/favicon.png"
     },
     "updates": {
-      "url": "https://u.expo.dev/f605138f-8358-4ccf-bb6b-4268c48289bc"
+      "url": "https://u.expo.dev/200e431b-ce51-491e-b119-943d1b9887e4"
     },
-    "owner": "namngocngo22",
+    "owner": "ngongocnam22101997",
     "extra": {
       "eas": {
-        "projectId": "f605138f-8358-4ccf-bb6b-4268c48289bc"
+        "projectId": "200e431b-ce51-491e-b119-943d1b9887e4"
       }
     }
   }

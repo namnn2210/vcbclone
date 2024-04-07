@@ -138,7 +138,7 @@ const BillScreen = ({ route }: { route: any }) => {
         await Notifications.scheduleNotificationAsync({
           content: {
             title: "Thông báo VCB",
-            body: `Số dư TK VCB ${dataRoute.userInfo.accountNumber} -${dataRoute.amount} VND lúc ${formattedDate}. Số dư ${currentUser.amount.toLocaleString('en-US')}. Ref MBVCB.${billNumber}.765644.${dataRoute.contentSend}`,
+            body: `Số dư TK VCB ${dataRoute.userInfo.accountNumber} -${dataRoute.amount} VND lúc ${formattedDate}. Số dư ${Number(currentUser.amount).toLocaleString('en-US')}. Ref MBVCB.${billNumber}.765644.${dataRoute.contentSend}`,
             data: { data: 'goes here' },
           },
           trigger: null,
