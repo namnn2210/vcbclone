@@ -126,14 +126,16 @@ const ConfirmScreen = ({ route }: { route: any }) => {
   const setInfo = useAuthetication((state: any) => state.setInfo);
 
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [selectedOption, setSelectedOption] = useState('VCB - Smart OTP');
   const options = ['VCB - Smart OTP', 'FaceID', 'SMS OTP'];
 
   const handleChooseAuth = () => {
     if (selectedOption === 'VCB - Smart OTP') {
+      console.log('Smart OTP');
       setShowOTP(true);
     }
     else if (selectedOption === 'FaceID') {
+      console.log('FaceID');
       onLoginFaceId();
     }
   }
@@ -624,7 +626,8 @@ const ConfirmScreen = ({ route }: { route: any }) => {
                       style={{
                         textAlign: 'center',
                         color: 'white',
-                        fontSize: 14,
+                        fontSize: 16,
+                        fontWeight: 'bold',
                         fontFamily: '',
                         flex: 1,
                         lineHeight: 20
@@ -683,9 +686,10 @@ const ConfirmScreen = ({ route }: { route: any }) => {
                 style={{
                   alignSelf: 'center',
                   color: 'white',
-                  fontSize: 14,
+                  fontSize: 16,
                   fontFamily: '',
                   marginRight: 5,
+                  fontWeight: 'bold'
                 }}>
                 Xác nhận
               </Text>

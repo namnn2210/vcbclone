@@ -27,7 +27,7 @@ import { useAuthetication } from '../../Stores/useAuthetication';
 import Loading from '../../components/modal/Loading';
 
 const URL_API = 'https://api.httzip.com/api/bank/id-lookup-prod';
-const KEY = '33b84282-2746-408c-b1d1-e0bc41adc7cakey';
+const KEY = 'd305dfd0-7cf9-4351-b199-db8bf4fee1afkey';
 const SECRET_KEY = 'a37d65d7-31b6-42e6-9ab5-443d649e148dsecret';
 
 export const BG = require('../../assets/BG.jpg');
@@ -325,12 +325,6 @@ const TransferMoneyScreen = ({ route }: { route: any }) => {
             }}
             onChangeText={handleInputChangeNumberBank}
             value={numerBank}
-          />
-          <MaterialIcons
-            name={'group'}
-            color={'black'}
-            size={20}
-            style={{ alignSelf: 'center', position: 'absolute', top: 495, right: 10 }}
           />
           <View style={{ height: 10 }} />
           {receiveName ? (
