@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
@@ -9,11 +9,22 @@ import styles from '../styles';
 import { useAuthetication } from '../../../Stores/useAuthetication';
 import { navigate } from '../../../Navigators/NavigationUtils';
 import { MAIN_NAVIGATION } from '../../../Navigators/MainNavigator';
+import { LocalStorage } from '@/localStore';
 
 const UserInfo = () => {
-  const state: any = useAuthetication();
-  const info = state.info;
+  const [userInfo, setUserInfo] = useState<any>({});
+  // const state: any = useAuthetication();
+  // const info = userInfo;
   const [seeAmout, setSeeAmout] = useState(false);
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const userInfo = await LocalStorage.getUser();
+      setUserInfo(userInfo);
+    };
+
+    fetchUserInfo();
+  }, []);
 
   const changeViewAmoutTrue = () => {
     setSeeAmout(true);
@@ -28,7 +39,7 @@ const UserInfo = () => {
         <Text style={{ color: 'gray', fontSize: 10, fontFamily: '' }}>Xin chào </Text>
         <Text
           style={{ color: 'white', fontSize: 15, fontFamily: '', marginLeft: 5, fontWeight: 'bold', textTransform: 'uppercase' }}>
-          {info?.name}
+          {userInfo?.name}
         </Text>
       </View>
       <View style={styles.info}>
@@ -49,7 +60,7 @@ const UserInfo = () => {
                 fontFamily: '',
                 marginRight: 5,
               }}>
-              {info?.accountNumber}
+              {userInfo?.accountNumber}
             </Text>
             <MaterialCommunityIcons
               name="content-copy"
@@ -62,7 +73,7 @@ const UserInfo = () => {
             <Text style={{ fontSize: 12, color: 'gray', fontFamily: '' }}>Số dư</Text>
             {seeAmout ? (
               <Text style={{ fontSize: 15, color: '#6cc102', marginLeft: 10 }}>{`${formatCurrency(
-                info.amount.toString(),
+                userInfo.amount.toString(),
               )} VND`}</Text>
             ) : (
               <Text style={{ fontSize: 15, color: '#6cc102', marginLeft: 10 }}>******</Text>

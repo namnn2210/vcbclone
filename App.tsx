@@ -1,48 +1,28 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { RootNavigator } from './src/Navigators/index';
 import { LogBox } from 'react-native';
 import { Provider } from 'react-redux';
 import { store } from './src/store/index';
-import * as Notifications from 'expo-notifications';
-import Constants from 'expo-constants';
-import { Platform } from 'react-native';
+import { initializeApp } from 'firebase/app';
+
 LogBox.ignoreAllLogs();
 
-async function registerForPushNotificationsAsync() {
-  let token;
-  if (Platform.OS !== 'web') {
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-    if (existingStatus !== 'granted') {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
-    if (finalStatus !== 'granted') {
-      alert('Failed to get push token for push notification!');
-      return;
-    }
-    token = (await Notifications.getExpoPushTokenAsync()).data;
-  } else {
-    alert('Must use physical device for Push Notifications');
-  }
+// Initialize Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyBf60TO16OIuQ7Hz2qtzIMdZE-PNhzNIfg",
+  authDomain: "vcb-clone.firebaseapp.com",
+  projectId: "vcb-clone",
+  storageBucket: "vcb-clone.appspot.com",
+  messagingSenderId: "296276456346",
+  appId: "1:296276456346:web:36a62460a238027b1f8023",
+  measurementId: "G-DD5XRFLEWQ"
+};
 
-  if (Platform.OS === 'android') {
-    Notifications.setNotificationChannelAsync('default', {
-      name: 'default',
-      importance: Notifications.AndroidImportance.MAX,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#FF231F7C',
-    });
-  }
-
-  return token;
-}
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
 
 function App() {
-  useEffect(() => {
-    registerForPushNotificationsAsync().then(token => console.log('ExpoToken: ', token));
-  }, []);
 
   return (
     <GestureHandlerRootView

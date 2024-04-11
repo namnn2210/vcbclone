@@ -139,7 +139,7 @@ const BillScreen = ({ route }: { route: any }) => {
           content: {
             title: "Thông báo VCB",
             body: `Số dư TK VCB ${dataRoute.userInfo.accountNumber} -${dataRoute.amount} VND lúc ${formattedDate}. Số dư ${Number(currentUser.amount).toLocaleString('en-US')}. Ref MBVCB.${billNumber}.765644.${dataRoute.contentSend}`,
-            data: { data: 'goes here' },
+            data: { data: dataRoute },
           },
           trigger: null,
         });
