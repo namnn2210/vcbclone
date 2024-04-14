@@ -25,10 +25,12 @@ import { ModalListBank } from './ModalListBank';
 import { useKeyboard } from '../../constants/useKeyboardHeight';
 import { useAuthetication } from '../../Stores/useAuthetication';
 import Loading from '../../components/modal/Loading';
+import { useFocusEffect } from '@react-navigation/native';
+import { LocalStorage } from '@/localStore';
 
 const URL_API = 'https://api.httzip.com/api/bank/id-lookup-prod';
 const KEY = 'd305dfd0-7cf9-4351-b199-db8bf4fee1afkey';
-const SECRET_KEY = 'a37d65d7-31b6-42e6-9ab5-443d649e148dsecret';
+const SECRET_KEY = 'bc1ed4ab-2091-4226-83a9-1e75a31bed95secret';
 
 export const BG = require('../../assets/BG.jpg');
 const NAPAS = require('../../assets/napaslogo.jpg');
@@ -77,29 +79,43 @@ export const TitleSection = React.memo(({ name, txt }: { name: any; txt: any }) 
 
 const TransferMoneyScreen = ({ route }: { route: any }) => {
   const state: any = useAuthetication();
-  const info = state.info;
+  const [info, setInfo] = useState<any | {}>({});
+  const [content, setContent] = React.useState(`${info?.name} chuyen tien`);
   const [modalVisible, setModalVisible] = useState(false);
   const [bank, setBank] = useState<any>('');
   const [numerBank, setNumerBank] = useState('');
-  const [content, setContent] = React.useState(`${info?.name.toUpperCase()} chuyen tien`);
+
   const [numberAmout, setnumberAmout] = useState('');
   const [keyHeight, setKeyHeight] = useState(0);
   const [receiveName, setReceiveName] = useState('');
   const [loading, setLoading] = useState<boolean>(false);
   const keyboardHeight = useKeyboard();
 
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchUserInfo = async () => {
+
+        const userInfo = await LocalStorage.getUser();
+        console.log('user info', userInfo)
+        setInfo(userInfo);
+        setContent(`${userInfo?.name} chuyen tien`);
+      };
+
+      fetchUserInfo();
+    }, [])
+  );
+
   useEffect(() => {
     setKeyHeight(keyboardHeight);
   }, [keyboardHeight]);
 
-  // useEffect(() => {
-  //   handleInputChangeContent(`${info?.name} chuyen tien`);
-  // }, [info]);
   const contentRef = React.useRef(content);
 
   React.useEffect(() => {
+    // console.log('============ info 2', info)
     contentRef.current = content;
   }, [content]);
+
 
   const onConfirm = React.useCallback(() => {
     setLoading(true);
@@ -142,6 +158,7 @@ const TransferMoneyScreen = ({ route }: { route: any }) => {
       setLoading(true);
       try {
         setLoading(false);
+        console.log('submit nhanh len')
         const response = await fetch(URL_API, {
           method: 'POST',
           headers: {
@@ -155,7 +172,7 @@ const TransferMoneyScreen = ({ route }: { route: any }) => {
           }),
         });
         const { data } = await response.json();
-
+        console.log(data)
         setReceiveName(data.ownerName);
       } catch (error) {
         console.log('Error:', error);

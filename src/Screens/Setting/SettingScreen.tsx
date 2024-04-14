@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -14,18 +14,42 @@ import { goBack } from '../../Navigators/NavigationUtils';
 import { useAuthetication } from '../../Stores/useAuthetication';
 import Loading from '../../components/modal/Loading';
 import { LocalStorage } from '../../localStore/index';
+import { useFocusEffect } from '@react-navigation/native';
 
 const SettingScreen = () => {
   const state: any = useAuthetication();
-  const info = state.info;
-  const setInfo = useAuthetication((state: any) => state.setInfo);
+  const [info, setInfo] = useState<any | {}>({});
+  // const setInfo = useAuthetication((state: any) => state.setInfo);
   const [amount, setAmount] = useState<string>(info.amount);
   const [name, setName] = useState<string>(info.name);
   const [accountNumber, setAccountNumber] = useState<string>(info?.accountNumber);
+  const [token, setToken] = useState<string>(info?.token);
   const [edit, setEdit] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const onSave = () => {
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const userInfo = await LocalStorage.getUser();
+      if (userInfo && Object.keys(userInfo).length > 0) {
+        setInfo(userInfo);
+        setAmount(userInfo.amount);
+        setName(userInfo.name);
+        setAccountNumber(userInfo.accountNumber);
+        setToken(userInfo.token);
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
+
+
+  useEffect(() => {
+    if (!loading) {
+      goBack();
+    }
+  }, [info, loading]);
+
+  const onSave = async () => {
     if (amount.length === 0 || accountNumber.length === 0) {
       return Alert.alert('Tài khoản hoặc số dư không được bỏ trống, vui lòng kiểm tra lại!');
     }
@@ -33,10 +57,10 @@ const SettingScreen = () => {
     setTimeout(() => {
       setLoading(false);
       setEdit(false);
-      setInfo({ ...info, accountNumber: accountNumber.trim(), amount: amount, name: name });
-      LocalStorage.setUser({ ...info, accountNumber: accountNumber.trim(), amount: amount, name: name })
+      setInfo({ ...info, accountNumber: accountNumber.trim(), amount: amount, name: name, token: token });
+      LocalStorage.setUser({ ...info, accountNumber: accountNumber.trim(), amount: amount, name: name, token: token })
       // Alert.alert('Cập nhật thông tin thành công!');
-      goBack();
+      // goBack();
     }, 1000);
   };
 
@@ -64,6 +88,8 @@ const SettingScreen = () => {
 
     return formattedNumber;
   };
+
+  console.log('setting screen user info', info)
 
   return (
     <View style={{ padding: 16, paddingTop: 50 }}>
@@ -230,36 +256,7 @@ const SettingScreen = () => {
         Số dư
       </Text>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 30 }}>
-        {/* {edit ? (
-          <TextInput
-            style={{
-              flex: 1,
-              borderRadius: 5,
-              backgroundColor: '#E5E5E5',
-              paddingHorizontal: 10,
-              height: 50,
-            }}
-            placeholder="Nhập số tiền "
-            onChangeText={setAmount}
-            keyboardType="numeric"
-            value={amount}
-          />
-        ) : (
-          <TextInput
-            style={{
-              flex: 1,
-              borderRadius: 5,
-              paddingHorizontal: 10,
-              height: 50,
-              fontWeight: 'bold',
-            }}
-            placeholder="Nhập số tiền"
-            onChangeText={setAmount}
-            keyboardType="numeric"
-            value={formatCurrency(amount)}
-            editable={false}
-          />
-        )} */}
+
         <TextInput
           placeholder="Nhập số tiền "
           onChangeText={(val: string) => {
@@ -278,6 +275,37 @@ const SettingScreen = () => {
           }}
           keyboardType="numeric"
           value={getNumber(amount)}
+          style={edit ? {
+            flex: 1,
+            borderRadius: 5,
+            backgroundColor: '#E5E5E5',
+            paddingHorizontal: 10,
+            height: 50,
+          } : {
+            flex: 1,
+            borderRadius: 5,
+            paddingHorizontal: 10,
+            height: 50,
+            fontWeight: 'bold',
+          }}
+          editable={edit}
+        />
+      </View>
+      <Text
+        style={{
+          color: 'gray',
+          fontSize: 12,
+          fontFamily: '',
+          width: 180,
+        }}>
+        Token
+      </Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 30 }}>
+
+        <TextInput
+          placeholder="Copy token "
+          keyboardType="numeric"
+          value={token}
           style={edit ? {
             flex: 1,
             borderRadius: 5,
