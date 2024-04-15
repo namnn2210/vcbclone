@@ -10,30 +10,43 @@ import { Label, HorizontalLine } from '../ConfirmScreen';
 import { useAuthetication } from '../../Stores/useAuthetication';
 import { formatCurrency } from '../TransferMoneyScreen/index';
 import { useTransactions } from '../../Stores/useTransactions';
-
+import { LocalStorage } from '@/localStore';
 
 const HistoryScreen = ({ route }: { route: any }) => {
   const state: any = useAuthetication();
-  const info = state.info;
+  // const info = state.info;
+  const [info, setInfo] = useState<any | {}>({});
   const transactionState: any = useTransactions();
   const listTransaction = transactionState.transactions;
   const [amout, setAmount] = useState('0');
 
-  const getAmout = React.useCallback(async () => {
-    const currentAmout = await AsyncStorage.getItem('amout');
-    if (currentAmout === null) {
-      setAmount('0');
-    } else {
-      setAmount(currentAmout);
-    }
-  }, []);
+  // const getAmout = React.useCallback(async () => {
+  //   const currentAmout = await AsyncStorage.getItem('amout');
+  //   if (currentAmout === null) {
+  //     setAmount('0');
+  //   } else {
+  //     setAmount(currentAmout);
+  //   }
+  // }, []);
 
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     const unsubscribe = getAmout();
+
+  //     return () => unsubscribe;
+  //   }, [getAmout]),
+  // );
   useFocusEffect(
     React.useCallback(() => {
-      const unsubscribe = getAmout();
+      const fetchUserInfo = async () => {
 
-      return () => unsubscribe;
-    }, [getAmout]),
+        const userInfo = await LocalStorage.getUser();
+        console.log('user info', userInfo)
+        setInfo(userInfo);
+      };
+
+      fetchUserInfo();
+    }, [])
   );
 
   return (
@@ -58,7 +71,7 @@ const HistoryScreen = ({ route }: { route: any }) => {
           <HorizontalLine />
           <PaddingMini />
           <PaddingMini />
-          <Label title="Số dư" txt1={`${formatCurrency(amout.toString())} VND`} />
+          <Label title="Số dư" txt1={`${formatCurrency(info.amount)} VND`} />
           <PaddingMini />
           <HorizontalLine />
           <PaddingMini />

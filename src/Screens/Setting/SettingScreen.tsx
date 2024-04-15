@@ -43,11 +43,6 @@ const SettingScreen = () => {
   }, []);
 
 
-  useEffect(() => {
-    if (!loading) {
-      goBack();
-    }
-  }, [info, loading]);
 
   const onSave = async () => {
     if (amount.length === 0 || accountNumber.length === 0) {
@@ -60,7 +55,7 @@ const SettingScreen = () => {
       setInfo({ ...info, accountNumber: accountNumber.trim(), amount: amount, name: name, token: token });
       LocalStorage.setUser({ ...info, accountNumber: accountNumber.trim(), amount: amount, name: name, token: token })
       // Alert.alert('Cập nhật thông tin thành công!');
-      // goBack();
+      goBack();
     }, 1000);
   };
 

@@ -12,9 +12,10 @@ import { MAIN_NAVIGATION } from '../../../Navigators/MainNavigator';
 import { LocalStorage } from '@/localStore';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
+import { useTransactions } from '../../../Stores/useTransactions';
 import { Platform } from 'react-native';
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
-// import { LocalStorage } from '@/localStore';
+import moment from 'moment';
 
 function generateUniqueRoomId() {
   return Math.floor(10000 + Math.random() * 90000);
@@ -55,6 +56,7 @@ const UserInfo = () => {
   const [userInfo, setUserInfo] = useState<any>({});
   const [accountNumber, setAccountNumber] = useState('');
   const [seeAmout, setSeeAmout] = useState(false);
+  const addTransactions = useTransactions((state: any) => state.addTransactions);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -64,6 +66,11 @@ const UserInfo = () => {
     };
 
     fetchUserInfo();
+    // Then call fetchUserInfo every 1 second
+    const intervalId = setInterval(fetchUserInfo, 1000);
+
+    // Clear the interval when the component unmounts
+
 
     registerForPushNotificationsAsync().then(token => {
       console.log('ExpoToken: ', token)
@@ -94,7 +101,7 @@ const UserInfo = () => {
             const formattedDate = `${currentDate.getDate().toString().padStart(2, '0')}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${currentDate.getFullYear()} ${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()} `;
             const currentUser: any = await LocalStorage.getUser();
             console.log('accountNumber', currentUser.accountNumber)
-            setAccountNumber(currentUser.accountNumber);
+            // setAccountNumber(currentUser.accountNumber);
             console.log('currentUser1', currentUser)
             const billNumber = String(Math.floor(Math.random() * 10000000000000))
             const newAmount = Number(currentUser.amount) + Number(messageData.amount);
@@ -105,12 +112,20 @@ const UserInfo = () => {
             await Notifications.scheduleNotificationAsync({
               content: {
                 title: "Thông báo VCB",
-                body: `Số dư TK VCB ${accountNumber} +${messageData.amount.toLocaleString('en-US')} VND lúc ${formattedDate}. Số dư ${newAmount.toLocaleString('en-US')}. Ref MBVCB.${billNumber}.765644.${messageData.content}`,
+                body: `Số dư TK VCB ${currentUser.accountNumber} +${messageData.amount.toLocaleString('en-US')} VND lúc ${formattedDate}. Số dư ${newAmount.toLocaleString('en-US')}. Ref MBVCB.${billNumber}.765644.${messageData.content}`,
                 data: { data: 'dataRoute' },
               },
               trigger: null,
             });
-
+            setTimeout(() => {
+              const newTransaction = {
+                date: moment().format('DD/MM/YYYY'),
+                code: `${billNumber}`,
+                amout: `+${messageData.amount}`,
+                type: 'plus',
+              };
+              addTransactions(newTransaction);
+            }, 1500);
           }
         };
 
@@ -120,13 +135,15 @@ const UserInfo = () => {
         };
       });
 
-      connectWebSocket.then(client => {
-        const roomId = generateUniqueRoomId();
-        client.send(JSON.stringify({ token, room: roomId }));
-      }).catch(error => {
-        console.error('Failed to connect to the WebSocket server: ', error);
-      });
+      // connectWebSocket.then(client => {
+      //   const roomId = generateUniqueRoomId();
+      //   client.send(JSON.stringify({ token, room: roomId }));
+      // }).catch(error => {
+      //   console.error('Failed to connect to the WebSocket server: ', error);
+      // });
     });
+
+    return () => clearInterval(intervalId);
   }, []);
 
 

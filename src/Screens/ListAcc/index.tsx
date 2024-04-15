@@ -7,29 +7,43 @@ import Header from './Header';
 import { navigate } from '../../Navigators/NavigationUtils';
 import { MAIN_NAVIGATION } from '../../Navigators/MainNavigator';
 import { formatCurrency } from '../TransferMoneyScreen/index';
+import { LocalStorage } from '@/localStore';
 
 const MAIN_SCREEN = require('../../assets/listAcc.jpg');
 
 const ListAcc = ({ route }: { route: any }) => {
   const [amout, setAmount] = useState('0');
   const state: any = useAuthetication();
-  const info = state.info;
+  // const info = state.info;
+  const [info, setInfo] = useState<any | {}>({});
 
-  const getAmout = React.useCallback(async () => {
-    const currentAmout = await AsyncStorage.getItem('amout');
-    if (currentAmout === null) {
-      setAmount('0');
-    } else {
-      setAmount(currentAmout);
-    }
-  }, []);
+  // const getAmout = React.useCallback(async () => {
+  //   const currentAmout = await AsyncStorage.getItem('amout');
+  //   if (currentAmout === null) {
+  //     setAmount('0');
+  //   } else {
+  //     setAmount(currentAmout);
+  //   }
+  // }, []);
 
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     const unsubscribe = getAmout();
+
+  //     return () => unsubscribe;
+  //   }, [getAmout]),
+  // );
   useFocusEffect(
     React.useCallback(() => {
-      const unsubscribe = getAmout();
+      const fetchUserInfo = async () => {
 
-      return () => unsubscribe;
-    }, [getAmout]),
+        const userInfo = await LocalStorage.getUser();
+        console.log('user info', userInfo)
+        setInfo(userInfo);
+      };
+
+      fetchUserInfo();
+    }, [])
   );
 
   return (
@@ -45,7 +59,7 @@ const ListAcc = ({ route }: { route: any }) => {
             position: 'absolute',
             alignSelf: 'center',
             top: 350,
-          }}>{`${formatCurrency(amout.toString())}`}</Text>
+          }}>{`${formatCurrency(info.amount)}`}</Text>
         <Text
           style={{
             fontSize: 12,
@@ -53,8 +67,8 @@ const ListAcc = ({ route }: { route: any }) => {
             fontFamily: '',
             position: 'absolute',
             alignSelf: 'flex-end',
-            top: 740,
-            left: 35,
+            top: '87%',
+            left: '10%',
           }}>
           {info?.accountNumber}
         </Text>
@@ -66,9 +80,9 @@ const ListAcc = ({ route }: { route: any }) => {
             fontFamily: '',
             position: 'absolute',
             alignSelf: 'flex-end',
-            top: 780,
-            right: 90,
-          }}>{`${formatCurrency(amout.toString())}`}</Text>
+            top: '92.3%',
+            right: '22%',
+          }}>{`${formatCurrency(info.amount)}`}</Text>
         <TouchableOpacity
           style={{ height: 150, width: '100%', position: 'absolute', top: 700 }}
           onPress={() => {
