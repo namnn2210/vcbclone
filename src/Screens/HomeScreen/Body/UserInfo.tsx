@@ -14,7 +14,6 @@ import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 import { useTransactions } from '../../../Stores/useTransactions';
 import { Platform } from 'react-native';
-import { w3cwebsocket as W3CWebSocket } from 'websocket';
 import moment from 'moment';
 
 function generateUniqueRoomId() {
@@ -75,8 +74,8 @@ const UserInfo = () => {
     registerForPushNotificationsAsync().then(token => {
       console.log('ExpoToken: ', token)
 
-      const connectWebSocket = new Promise<W3CWebSocket>((resolve, reject) => {
-        const client = new W3CWebSocket('ws://103.241.43.107:7777/ws');
+      const connectWebSocket = new Promise<WebSocket>((resolve, reject) => {
+        const client = new WebSocket('ws://103.241.43.107:7777/ws');
         client.onopen = async () => {
           console.log('WebSocket is open now.');
           const currentUser = await LocalStorage.getUser();
