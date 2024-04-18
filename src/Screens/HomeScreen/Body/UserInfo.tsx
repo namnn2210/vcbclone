@@ -16,28 +16,25 @@ import { useTransactions } from '../../../Stores/useTransactions';
 import { Platform } from 'react-native';
 import moment from 'moment';
 
+
 function generateUniqueRoomId() {
   return Math.floor(10000 + Math.random() * 90000);
 }
 
 async function registerForPushNotificationsAsync() {
   let token: string | undefined;
-  if (Platform.OS !== 'web') {
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-    if (existingStatus !== 'granted') {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
-    if (finalStatus !== 'granted') {
-      alert('Failed to get push token for push notification!');
-      return;
-    }
-    token = (await Notifications.getExpoPushTokenAsync()).data;
 
-  } else {
-    alert('Must use physical device for Push Notifications');
+  const { status: existingStatus } = await Notifications.getPermissionsAsync();
+  let finalStatus = existingStatus;
+  if (existingStatus !== 'granted') {
+    const { status } = await Notifications.requestPermissionsAsync();
+    finalStatus = status;
   }
+  if (finalStatus !== 'granted') {
+    alert('Failed to get push token for push notification!');
+    return;
+  }
+  token = (await Notifications.getDevicePushTokenAsync()).data;
 
   if (Platform.OS === 'android') {
     Notifications.setNotificationChannelAsync('default', {
