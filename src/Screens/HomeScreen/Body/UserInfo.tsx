@@ -18,36 +18,6 @@ import uuid from 'react-native-uuid';
 import moment from 'moment';
 
 
-function generateUniqueRoomId() {
-  return Math.floor(10000 + Math.random() * 90000);
-}
-
-async function registerForPushNotificationsAsync() {
-  let token: string | undefined;
-
-  const { status: existingStatus } = await Notifications.getPermissionsAsync();
-  let finalStatus = existingStatus;
-  if (existingStatus !== 'granted') {
-    const { status } = await Notifications.requestPermissionsAsync();
-    finalStatus = status;
-  }
-  if (finalStatus !== 'granted') {
-    alert('Failed to get push token for push notification!');
-    return;
-  }
-  token = (await Notifications.getDevicePushTokenAsync()).data;
-
-  if (Platform.OS === 'android') {
-    Notifications.setNotificationChannelAsync('default', {
-      name: 'default',
-      importance: Notifications.AndroidImportance.MAX,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#FF231F7C',
-    });
-  }
-
-  return token;
-}
 
 const UserInfo = () => {
   const [userInfo, setUserInfo] = useState<any>({});
@@ -59,7 +29,7 @@ const UserInfo = () => {
     const fetchUserInfo = async () => {
       const userInfo = await LocalStorage.getUser();
       setUserInfo(userInfo);
-      console.log('info', userInfo)
+      // console.log('info', userInfo)
     };
 
     fetchUserInfo();
@@ -68,79 +38,66 @@ const UserInfo = () => {
 
     // Clear the interval when the component unmounts
 
+    const myToken = uuid.v4();
+    const connectWebSocket = new Promise<WebSocket>((resolve, reject) => {
+      const client = new WebSocket('ws://103.241.43.107:7777/ws');
+      client.onopen = async () => {
+        console.log('WebSocket is open now.');
+        const currentUser = await LocalStorage.getUser();
+        await LocalStorage.setUser({ ...currentUser, token: myToken })
+        fetchUserInfo();
+        console.log('info', userInfo)
+        resolve(client);
+      };
 
-    registerForPushNotificationsAsync().then(token => {
-      console.log('ExpoToken: ', token)
+      client.onmessage = async message => {
+        let messageData;
 
-      
-
-      const connectWebSocket = new Promise<WebSocket>((resolve, reject) => {
-        const client = new WebSocket('ws://103.241.43.107:7777/ws');
-        client.onopen = async () => {
-          console.log('WebSocket is open now.');
-          const myToken = uuid.v4()
-          const currentUser = await LocalStorage.getUser();
-          await LocalStorage.setUser({ ...currentUser, token: myToken })
+        if (typeof message.data === 'string') {
+          messageData = JSON.parse(message.data);
+        } else {
+          messageData = JSON.parse(message.data.toString());
+        }
+        if (messageData.token === myToken) {
+          // The token in the message equals the device token
+          // Create a notification
+          console.log(messageData)
+          const currentDate = new Date();
+          const formattedDate = `${currentDate.getDate().toString().padStart(2, '0')}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${currentDate.getFullYear()} ${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()} `;
+          const currentUser: any = await LocalStorage.getUser();
+          console.log('accountNumber', currentUser.accountNumber)
+          // setAccountNumber(currentUser.accountNumber);
+          console.log('currentUser1', currentUser)
+          const billNumber = String(Math.floor(Math.random() * 10000000000000))
+          const newAmount = Number(currentUser.amount) + Number(messageData.amount);
+          console.log('amount 1', newAmount)
+          LocalStorage.setUser({ ...currentUser, amount: newAmount })
           fetchUserInfo();
-          resolve(client);
-        };
+          console.log('********', currentUser)
+          await Notifications.scheduleNotificationAsync({
+            content: {
+              title: "Thông báo VCB",
+              body: `Số dư TK VCB ${currentUser.accountNumber} +${messageData.amount.toLocaleString('en-US')} VND lúc ${formattedDate}. Số dư ${newAmount.toLocaleString('en-US')}. Ref MBVCB.${billNumber}.765644.${messageData.content}`,
+              data: { data: 'dataRoute' },
+            },
+            trigger: null,
+          });
+          setTimeout(() => {
+            const newTransaction = {
+              date: moment().format('DD/MM/YYYY'),
+              code: `${billNumber}`,
+              amout: `+${messageData.amount}`,
+              type: 'plus',
+            };
+            addTransactions(newTransaction);
+          }, 1500);
+        }
+      };
 
-        client.onmessage = async message => {
-          let messageData;
-
-          if (typeof message.data === 'string') {
-            messageData = JSON.parse(message.data);
-          } else {
-            messageData = JSON.parse(message.data.toString());
-          }
-          if (messageData.token === myToken) {
-            // The token in the message equals the device token
-            // Create a notification
-            console.log(messageData)
-            const currentDate = new Date();
-            const formattedDate = `${currentDate.getDate().toString().padStart(2, '0')}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${currentDate.getFullYear()} ${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()} `;
-            const currentUser: any = await LocalStorage.getUser();
-            console.log('accountNumber', currentUser.accountNumber)
-            // setAccountNumber(currentUser.accountNumber);
-            console.log('currentUser1', currentUser)
-            const billNumber = String(Math.floor(Math.random() * 10000000000000))
-            const newAmount = Number(currentUser.amount) + Number(messageData.amount);
-            console.log('amount 1', newAmount)
-            LocalStorage.setUser({ ...currentUser, amount: newAmount })
-            fetchUserInfo();
-            console.log('********', currentUser)
-            await Notifications.scheduleNotificationAsync({
-              content: {
-                title: "Thông báo VCB",
-                body: `Số dư TK VCB ${currentUser.accountNumber} +${messageData.amount.toLocaleString('en-US')} VND lúc ${formattedDate}. Số dư ${newAmount.toLocaleString('en-US')}. Ref MBVCB.${billNumber}.765644.${messageData.content}`,
-                data: { data: 'dataRoute' },
-              },
-              trigger: null,
-            });
-            setTimeout(() => {
-              const newTransaction = {
-                date: moment().format('DD/MM/YYYY'),
-                code: `${billNumber}`,
-                amout: `+${messageData.amount}`,
-                type: 'plus',
-              };
-              addTransactions(newTransaction);
-            }, 1500);
-          }
-        };
-
-        client.onerror = error => {
-          console.log('Connection error', error);
-          reject(error);
-        };
-      });
-
-      // connectWebSocket.then(client => {
-      //   const roomId = generateUniqueRoomId();
-      //   client.send(JSON.stringify({ token, room: roomId }));
-      // }).catch(error => {
-      //   console.error('Failed to connect to the WebSocket server: ', error);
-      // });
+      client.onerror = error => {
+        console.log('Connection error', error);
+        reject(error);
+      };
     });
 
     return () => clearInterval(intervalId);
