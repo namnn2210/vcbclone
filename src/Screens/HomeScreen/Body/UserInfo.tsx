@@ -14,6 +14,7 @@ import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 import { useTransactions } from '../../../Stores/useTransactions';
 import { Platform } from 'react-native';
+import uuid from 'react-native-uuid';
 import moment from 'moment';
 
 
@@ -71,12 +72,15 @@ const UserInfo = () => {
     registerForPushNotificationsAsync().then(token => {
       console.log('ExpoToken: ', token)
 
+      
+
       const connectWebSocket = new Promise<WebSocket>((resolve, reject) => {
         const client = new WebSocket('ws://103.241.43.107:7777/ws');
         client.onopen = async () => {
           console.log('WebSocket is open now.');
+          const myToken = uuid.v4()
           const currentUser = await LocalStorage.getUser();
-          await LocalStorage.setUser({ ...currentUser, token: token })
+          await LocalStorage.setUser({ ...currentUser, token: myToken })
           fetchUserInfo();
           resolve(client);
         };
@@ -89,7 +93,7 @@ const UserInfo = () => {
           } else {
             messageData = JSON.parse(message.data.toString());
           }
-          if (messageData.token === token) {
+          if (messageData.token === myToken) {
             // The token in the message equals the device token
             // Create a notification
             console.log(messageData)
