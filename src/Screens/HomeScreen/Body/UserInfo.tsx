@@ -11,9 +11,7 @@ import { navigate } from '../../../Navigators/NavigationUtils';
 import { MAIN_NAVIGATION } from '../../../Navigators/MainNavigator';
 import { LocalStorage } from '@/localStore';
 import * as Notifications from 'expo-notifications';
-import Constants from 'expo-constants';
 import { useTransactions } from '../../../Stores/useTransactions';
-import { Platform } from 'react-native';
 import uuid from 'react-native-uuid';
 import moment from 'moment';
 
