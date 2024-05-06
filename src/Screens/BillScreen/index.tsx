@@ -17,7 +17,7 @@ const TOGGLE = require('../../assets/toggleSw.png');
 
 const camera = require('../../assets/camera.png');
 const share = require('../../assets/share.png');
-const profile = require('../../assets/share.png');
+const profile = require('../../assets/profile.png');
 
 const HorizontalLine = () => {
   return <View style={{ height: 2, width: '100%', backgroundColor: 'rgba(256, 256, 256, 0.2)' }} />;
