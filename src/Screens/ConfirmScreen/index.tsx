@@ -189,12 +189,6 @@ const ConfirmScreen = ({ route }: { route: any }) => {
     async () => {
       setLoading(true);
       const currentAmout: any = await LocalStorage.getUser();
-      var chooseDate = '';
-      if (dataRoute?.amount === '100,000,000') {
-        chooseDate = '2024-02-05';
-      } else if (dataRoute?.amount === '89,000,000') {
-        chooseDate = '2024-03-05';
-      }
       console.log('=============', chooseDate)
       const amoutAfterTransferConvert: any = convertToInteger(dataRoute?.amount);
       const amoutAfterTransfer = parseInt(currentAmout.amount) - parseInt(amoutAfterTransferConvert);
@@ -202,7 +196,7 @@ const ConfirmScreen = ({ route }: { route: any }) => {
       setInfo({ ...currentAmout, amount: amoutAfterTransfer.toString() });
       setTimeout(() => {
         const newTransaction = {
-          date: chooseDate,
+          date: moment().format('DD/MM/YYYY'),
           code: `${Math.floor(Math.random() * 1000000000)}.${Math.floor(Math.random() * 1000000000)}.${Math.floor(
             Math.random() * 1000000000,
           )}`,
