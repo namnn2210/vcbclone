@@ -189,7 +189,6 @@ const ConfirmScreen = ({ route }: { route: any }) => {
     async () => {
       setLoading(true);
       const currentAmout: any = await LocalStorage.getUser();
-      console.log('=============', chooseDate)
       const amoutAfterTransferConvert: any = convertToInteger(dataRoute?.amount);
       const amoutAfterTransfer = parseInt(currentAmout.amount) - parseInt(amoutAfterTransferConvert);
       LocalStorage.setUser({ ...currentAmout, amount: amoutAfterTransfer.toString() })
