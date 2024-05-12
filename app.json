@@ -2,7 +2,7 @@
   "expo": {
     "name": "VCB Digibank",
     "slug": "vcb-digibank",
-    "version": "2.0.0",
+    "version": "3.0.0",
     "orientation": "portrait",
     "icon": "./assets/vcb_icon.png",
     "userInterfaceStyle": "light",
@@ -67,14 +67,6 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "updates": {
-      "url": "https://u.expo.dev/4603fdd7-ed68-4188-8350-3d164e71a0ea"
-    },
-    "owner": "ngongocnam22101997",
-    "extra": {
-      "eas": {
-        "projectId": "4603fdd7-ed68-4188-8350-3d164e71a0ea"
-      }
-    }
+    "owner": "chris.nn2522"
   }
 }
