@@ -69,6 +69,7 @@ const UserInfo = () => {
           // setAccountNumber(currentUser.accountNumber);
           console.log('currentUser1', currentUser)
           const billNumber = String(Math.floor(Math.random() * 10000000000000))
+          const billNumber2 = String(Math.floor(Math.random() * 10000))
           const newAmount = Number(currentUser.amount) + Number(messageData.amount);
           console.log('amount 1', newAmount)
           LocalStorage.setUser({ ...currentUser, amount: newAmount })
@@ -77,7 +78,7 @@ const UserInfo = () => {
           await Notifications.scheduleNotificationAsync({
             content: {
               title: "Thông báo VCB",
-              body: `Số dư TK VCB ${currentUser.accountNumber} +${messageData.amount.toLocaleString('en-US')} VND lúc ${formattedDate}. Số dư ${newAmount.toLocaleString('en-US')}. Ref MBVCB.${billNumber}.765644.${messageData.content}`,
+              body: `Số dư TK VCB ${currentUser.accountNumber} +${messageData.amount.toLocaleString('en-US')} VND lúc ${formattedDate}. Số dư ${newAmount.toLocaleString('en-US')}. Ref MBVCB.${billNumber}.${billNumber2}.${messageData.content}`,
               data: { data: 'dataRoute' },
             },
             trigger: null,
@@ -161,7 +162,7 @@ const UserInfo = () => {
               await Notifications.scheduleNotificationAsync({
                 content: {
                   title: "Thông báo VCB",
-                  body: `Số dư TK VCB ${currentUser.accountNumber} +${messageData.amount.toLocaleString('en-US')} VND lúc ${formattedDate}. Số dư ${newAmount.toLocaleString('en-US')}. Ref MBVCB.${billNumber}.765644.${messageData.content}`,
+                  body: `Số dư TK VCB ${currentUser.accountNumber} +${messageData.amount.toLocaleString('en-US')} VND lúc ${formattedDate}. Số dư ${newAmount.toLocaleString('en-US')}. Ref MBVCB.${billNumber}.${billNumber2}.${messageData.content}`,
                   data: { data: 'dataRoute' },
                 },
                 trigger: null,

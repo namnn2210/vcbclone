@@ -215,12 +215,6 @@ const ConfirmScreen = ({ route }: { route: any }) => {
       const res: any = await LocalAuthentication.authenticateAsync();
       if (!!res) {
         setLoading(true);
-        var chooseDate = '';
-        if (dataRoute?.amount === 100000000) {
-          chooseDate = '2024-02-05';
-        } else if (dataRoute?.amount === 89000000) {
-          chooseDate = '2024-03-05';
-        }
         const currentAmout: any = await LocalStorage.getUser();
         const amoutAfterTransferConvert: any = convertToInteger(dataRoute?.amount);
         const amoutAfterTransfer = parseInt(currentAmout.amount) - parseInt(amoutAfterTransferConvert);
@@ -267,7 +261,7 @@ const ConfirmScreen = ({ route }: { route: any }) => {
           <Padding />
           <HorizontalLine />
           <PaddingMini />
-          <Label title="Tài khoản nguồn" txt1="1010962347" />
+          <Label title="Tài khoản nguồn" txt1={dataRoute?.userInfo.accountNumber} />
           <PaddingMini />
           <HorizontalLine />
           <PaddingMini />
