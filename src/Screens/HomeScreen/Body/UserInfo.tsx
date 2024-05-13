@@ -27,6 +27,7 @@ const UserInfo = () => {
 
   const fetchUserInfo = async () => {
     const userInfo = await LocalStorage.getUser();
+    // console.log('userInfo get from local storage', userInfo)
     setUserInfo(userInfo);
     // console.log('info', userInfo)
   };
@@ -51,7 +52,7 @@ const UserInfo = () => {
 
       client.onmessage = async message => {
         let messageData;
-        const currentUser = await LocalStorage.getUser();
+        var currentUser = await LocalStorage.getUser();
 
         if (typeof message.data === 'string') {
           messageData = JSON.parse(message.data);
@@ -64,7 +65,7 @@ const UserInfo = () => {
           console.log(messageData)
           const currentDate = new Date();
           const formattedDate = `${currentDate.getDate().toString().padStart(2, '0')}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${currentDate.getFullYear()} ${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()} `;
-          const currentUser: any = await LocalStorage.getUser();
+          currentUser = await LocalStorage.getUser();
           console.log('accountNumber', currentUser.accountNumber)
           // setAccountNumber(currentUser.accountNumber);
           console.log('currentUser1', currentUser)
@@ -74,7 +75,9 @@ const UserInfo = () => {
           console.log('amount 1', newAmount)
           LocalStorage.setUser({ ...currentUser, amount: newAmount })
           fetchUserInfo();
+          currentUser = await LocalStorage.getUser();
           console.log('********', currentUser)
+          console.log('send noti')
           await Notifications.scheduleNotificationAsync({
             content: {
               title: "Thông báo VCB",
@@ -136,7 +139,7 @@ const UserInfo = () => {
 
           client.onmessage = async message => {
             let messageData;
-            const currentUser = await LocalStorage.getUser();
+            var currentUser = await LocalStorage.getUser();
             if (typeof message.data === 'string') {
               messageData = JSON.parse(message.data);
             } else {
@@ -148,17 +151,19 @@ const UserInfo = () => {
               console.log(messageData)
               const currentDate = new Date();
               const formattedDate = `${currentDate.getDate().toString().padStart(2, '0')}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${currentDate.getFullYear()} ${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()} `;
-              const currentUser: any = await LocalStorage.getUser();
-              console.log('accountNumber', currentUser.accountNumber)
+              currentUser = await LocalStorage.getUser();
               // setAccountNumber(currentUser.accountNumber);
-              console.log('currentUser1', currentUser)
+              console.log('currentUser again', currentUser)
               const billNumber = String(Math.floor(Math.random() * 10000000000000))
+              const billNumber2 = String(Math.floor(Math.random() * 10000))
               const newAmount = Number(currentUser.amount) + Number(messageData.amount);
-              console.log('amount 1', newAmount)
+              console.log('newAmount again', newAmount)
               LocalStorage.setUser({ ...currentUser, amount: newAmount })
               fetchUserInfo();
+              currentUser = await LocalStorage.getUser();
               // setUserInfo(userInfo);
-              console.log('********', currentUser)
+              console.log('******** again', currentUser)
+              console.log('send noti again')
               await Notifications.scheduleNotificationAsync({
                 content: {
                   title: "Thông báo VCB",
