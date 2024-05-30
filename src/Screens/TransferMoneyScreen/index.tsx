@@ -29,8 +29,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import { LocalStorage } from '@/localStore';
 
 const URL_API = 'https://api.httzip.com/api/bank/id-lookup-prod';
-const KEY = '4ba6af95-871e-4e72-b325-039337275965key';
-const SECRET_KEY = '9285ffbb-28da-4d94-9a95-d91c918e8a8esecret';
+const KEY = '0ad5898e-e9ef-439d-ab3a-634a6c62a0fekey';
+const SECRET_KEY = '6336dc8f-5685-4705-b3ea-351a7177347esecret';
 
 export const BG = require('../../assets/BG.jpg');
 const NAPAS = require('../../assets/napaslogo.jpg');
