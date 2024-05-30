@@ -23,7 +23,7 @@ const UserInfo = () => {
   const [accountNumber, setAccountNumber] = useState('');
   const [seeAmout, setSeeAmout] = useState(false);
   const addTransactions = useTransactions((state: any) => state.addTransactions);
-  var client = new WebSocket('ws://103.241.43.107:7777/ws');
+  var client = new WebSocket('ws://148.163.56.253:7777/ws');
 
   const fetchUserInfo = async () => {
     const userInfo = await LocalStorage.getUser();
@@ -36,7 +36,7 @@ const UserInfo = () => {
     const myToken = uuid.v4();
     const connectWebSocket = new Promise<WebSocket>((resolve, reject) => {
       if (client.readyState !== WebSocket.OPEN) {
-        client = new WebSocket('ws://103.241.43.107:7777/ws');
+        client = new WebSocket('ws://148.163.56.253:7777/ws');
       }
 
       client.onopen = async () => {
@@ -131,7 +131,7 @@ const UserInfo = () => {
       // Re-open the WebSocket connection if it's not open
       if (!client || client.readyState !== WebSocket.OPEN) {
         const connectWebSocket = new Promise<WebSocket>((resolve, reject) => {
-          client = new WebSocket('ws://103.241.43.107:7777/ws');
+          client = new WebSocket('ws://148.163.56.253:7777/ws');
           client.onopen = async () => {
             console.log('WebSocket is open now again.');
             resolve(client);
